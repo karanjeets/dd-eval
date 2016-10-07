@@ -27,7 +27,7 @@ public class BuildKnowledgeBase {
                 String content = null;
                 try {
                     content = Search.getPageText(url);
-                    if (content != null || content.trim().length() != 0) {
+                    if (content != null || content.trim().length() <= 100) {
                         content = content.replaceAll("\\n", " ");
                         nbBw.append("1\t" + content + "\n");
                         cosineBw.append(content + "\n");

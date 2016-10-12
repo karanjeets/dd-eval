@@ -1,5 +1,6 @@
 package gov.nasa.jpl;
 
+import gov.nasa.jpl.util.CommonUtil;
 import gov.nasa.jpl.util.Search;
 import org.apache.commons.io.IOUtils;
 
@@ -55,13 +56,6 @@ public class BuildKnowledgeBase {
         }
     }
 
-    public static void makeSafeDir(String dirPath) throws Exception {
-        File dir = new File(dirPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-    }
-
     public static void main(String[] args) throws Exception {
         String urlPath = args[0];
         String outDirPath = args[1];
@@ -70,9 +64,9 @@ public class BuildKnowledgeBase {
         String knowledgeModelDirPath = outDirPath + File.separator + "kb-models";
 
         File urlFile = new File(urlPath);
-        makeSafeDir(nbModelDirPath);
-        makeSafeDir(cosineModelDirPath);
-        makeSafeDir(knowledgeModelDirPath);
+        CommonUtil.makeSafeDir(nbModelDirPath);
+        CommonUtil.makeSafeDir(cosineModelDirPath);
+        CommonUtil.makeSafeDir(knowledgeModelDirPath);
 
         if (urlFile.isDirectory()) {
             processUrlFile(urlFile.listFiles(), nbModelDirPath, cosineModelDirPath, knowledgeModelDirPath);

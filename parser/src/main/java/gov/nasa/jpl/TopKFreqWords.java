@@ -1,6 +1,7 @@
 package gov.nasa.jpl;
 
 import com.google.common.collect.Lists;
+import gov.nasa.jpl.util.CommonUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +13,7 @@ import java.util.*;
  */
 public class TopKFreqWords {
 
-    public final static int K = 20;
+    public final static int K = 15;
     public final static String STOP_WORDS_FILE = "stop-words.txt";
     private Set<String> stopWords = new HashSet<String>();
 
@@ -104,22 +105,52 @@ public class TopKFreqWords {
         return Lists.reverse(result);
     }
 
-    public static void main (String[] args) {
+    public static void processFile(File inputFile, String outputFilePath) {
         TopKFreqWords topKFreqWords = new TopKFreqWords();
-        String inputPath = args[0];
         InputStream is = null;
         List<String> result;
         try {
-            is = new FileInputStream(new File(inputPath));
+            is = new FileInputStream(inputFile);
             result = topKFreqWords.find(is, K);
-            for (String word: result) {
-                System.out.println(word);
+
+            // Write to output file
+            File freqWordsModel = new File(outputFilePath + File.separator + inputFile.getName().replace("cosine", "freq"));
+            BufferedReader br = null;
+            BufferedWriter freqBw = null;
+            try {
+                br = new BufferedReader(new FileReader(inputFile));
+                freqBw = new BufferedWriter(new FileWriter(freqWordsModel));
+                for (String word: result) {
+                    freqBw.append(word + "\n");
+                }
+            } finally {
+                IOUtils.closeQuietly(br);
+                IOUtils.closeQuietly(freqBw);
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error Reading the Input Stream");
         } finally {
             IOUtils.closeQuietly(is);
+        }
+    }
+
+    public static void processFile(File[] files, String outputFilePath) {
+        for (File file: files) {
+            processFile(file, outputFilePath);
+        }
+    }
+
+    public static void main (String[] args) throws Exception {
+        String inputPath = args[0];
+        String outputPath = args[1] + File.separator + "freq-words";
+        CommonUtil.makeSafeDir(outputPath);
+        File inputFile = new File(inputPath);
+
+        if (inputFile.isDirectory()) {
+            processFile(inputFile.listFiles(), outputPath);
+        } else {
+            processFile(inputFile, outputPath);
         }
     }
 
